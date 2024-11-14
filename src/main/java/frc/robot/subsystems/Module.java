@@ -36,7 +36,7 @@ public class Module {
 
     public boolean resetting;
 
-    private SwerveModuleState currentState;
+    private SwerveModuleState currentSpeeds;
 
     // turning and driving power/distance
     private double turnOutput;
@@ -69,7 +69,7 @@ public class Module {
             // I = rate of change of D
             // D = rate of change of P (slow when get closer)
 
-            currentState = new SwerveModuleState(Constants.Mechanical.kPhysicalMaxAngularSpeedRadiansPerSecond, new Rotation2d(getCurrentAngleRad()));
+            currentSpeeds = new SwerveModuleState(Constants.Mechanical.kPhysicalMaxAngularSpeedRadiansPerSecond, new Rotation2d(getCurrentAngleRad()));
             PathPlannerLogging.setLogActivePathCallback((poses) -> field.getObject("path").setPoses(poses));
             field = new Field2d();
             SmartDashboard.putData("Field", field);
@@ -77,7 +77,7 @@ public class Module {
  
     // Return all data of the position of the robot - type SwerveModuleState
     public SwerveModuleState getState() {
-        return currentState;
+        return currentSpeeds;
     }
 
     // Return all data of the position of the robot - type SwerveModulePosition
@@ -98,11 +98,12 @@ public class Module {
             }
 
             // Optimize angle
-            currentState.optimize(new Rotation2d(getCurrentAngleRad()));
+            pNewState.optimize(new Rotation2d(getCurrentAngleRad()));
+            currentSpeeds = pNewState;
             
             // Set power to motor
-            driveOutput = (currentState.speedMetersPerSecond * Math.cos(turningPID.getError())) / Constants.Mechanical.kPhysicalMaxSpeedMetersPerSecond * 3;
-            turnOutput = turningPID.calculate(getCurrentAngleRad(), currentState.angle.getRadians()) * Constants.Mechanical.kPhysicalMaxAngularSpeedRadiansPerSecond * 2;
+            driveOutput = (currentSpeeds.speedMetersPerSecond * Math.cos(turningPID.getError())) / Constants.Mechanical.kPhysicalMaxSpeedMetersPerSecond * 3;
+            turnOutput = turningPID.calculate(getCurrentAngleRad(), currentSpeeds.angle.getRadians()) * Constants.Mechanical.kPhysicalMaxAngularSpeedRadiansPerSecond * 2;
             mDriveMotor.set(driveOutput*2);
             mTurnMotor.set(turnOutput); 
             
@@ -110,7 +111,7 @@ public class Module {
             SmartDashboard.putNumber("before" + mDriveMotor.getDeviceID(), pNewState.angle.getDegrees());
             SmartDashboard.putNumber("turn " + mDriveMotor.getDeviceID() + " output", turnOutput);
             SmartDashboard.putNumber("drive " + mDriveMotor.getDeviceID() + " output", driveOutput);
-            SmartDashboard.putString("Swerve[" + absoluteEncoder.getDeviceID() + "] state", currentState.toString());
+            SmartDashboard.putString("Swerve[" + absoluteEncoder.getDeviceID() + "] state", currentSpeeds.toString());
             
         } else {
             // Reset wheel rotations
