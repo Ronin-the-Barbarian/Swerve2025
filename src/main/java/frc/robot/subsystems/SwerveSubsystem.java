@@ -72,7 +72,7 @@ public class SwerveSubsystem extends SubsystemBase {
     private final SwerveDriveOdometry mOdometer;
     private RobotConfig pathPlannerConfig;
 
-    private ChassisSpeeds chassisSpeeds;
+    private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
     // Simulated field
     public static final Field2d mField2d = new Field2d();
@@ -84,20 +84,21 @@ public class SwerveSubsystem extends SubsystemBase {
             new Pose2d()
     };
 
+        
     // Constructor
     public SwerveSubsystem() {
-
+        
         mOdometer = new SwerveDriveOdometry(Constants.Mechanical.kDriveKinematics, new Rotation2d(),
-                new SwerveModulePosition[] {
-                        modules[0].getPosition(),
-                        modules[1].getPosition(),
-                        modules[2].getPosition(),
-                        modules[3].getPosition()
-                });
-
+        new SwerveModulePosition[] {
+            modules[0].getPosition(),
+            modules[1].getPosition(),
+            modules[2].getPosition(),
+            modules[3].getPosition()
+        });
+        
         // Simulated field
         SmartDashboard.putData("Field", mField2d);
-
+        
         try{
             pathPlannerConfig = RobotConfig.fromGUISettings();
         } catch (Exception e) {
@@ -111,23 +112,23 @@ public class SwerveSubsystem extends SubsystemBase {
             this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
             (speeds, feedforwards) -> driveRobotRelative(speeds), // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
             new PPHolonomicDriveController( // PPHolonomicController is the built in path following controller for holonomic drive trains
-                    new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+            new PIDConstants(0.05, 0.0, 0.0), // Translation PID constants
+            new PIDConstants(0.05, 0.0, 0.0) // Rotation PID constants
             ),
             pathPlannerConfig, // The robot configuration
             () -> {
-              // Boolean supplier that controls when the path will be mirrored for the red alliance
-              // This will flip the path being followed to the red side of the field.
-              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-              var alliance = DriverStation.getAlliance();
-              if (alliance.isPresent()) {
+                // Boolean supplier that controls when the path will be mirrored for the red alliance
+            // This will flip the path being followed to the red side of the field.
+            // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+            
+            var alliance = DriverStation.getAlliance();
+            if (alliance.isPresent()) {
                 return alliance.get() == DriverStation.Alliance.Red;
-              }
-              return false;
-            },
-            this // Reference to this subsystem to set requirements
-    );
+            }
+            return false;
+        },
+        this // Reference to this subsystem to set requirements
+        );
     }
 
     // Get position of robot based on odometer

@@ -8,8 +8,6 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 
-import java.lang.reflect.Field;
-
 import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
@@ -105,7 +103,7 @@ public class Module {
             // Set power to motor
             driveOutput = (currentSpeeds.speedMetersPerSecond * Math.cos(turningPID.getError())) / Constants.Mechanical.kPhysicalMaxSpeedMetersPerSecond * 3;
             turnOutput = turningPID.calculate(getCurrentAngleRad(), currentSpeeds.angle.getRadians()) * Constants.Mechanical.kPhysicalMaxAngularSpeedRadiansPerSecond * 2;
-            mDriveMotor.set(driveOutput*2);
+            mDriveMotor.set(driveOutput/5);
             mTurnMotor.set(turnOutput); 
             
             // Telemetry
