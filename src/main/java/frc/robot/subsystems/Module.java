@@ -33,6 +33,8 @@ public class Module {
     private final double absoluteEncoderOffset;
 
     public boolean resetting;
+    public static boolean fast;
+    public static boolean slow;
 
     private SwerveModuleState currentSpeeds;
     // I am testing this for github purposes
@@ -103,13 +105,15 @@ public class Module {
             // Set power to motor
             driveOutput = (currentSpeeds.speedMetersPerSecond * Math.cos(turningPID.getError())) / Constants.Mechanical.kPhysicalMaxSpeedMetersPerSecond * 3;
             turnOutput = turningPID.calculate(getCurrentAngleRad(), currentSpeeds.angle.getRadians()) * Constants.Mechanical.kPhysicalMaxAngularSpeedRadiansPerSecond * 2;
-            mDriveMotor.set(driveOutput/5);
-            mTurnMotor.set(turnOutput); 
+            speedChange();
+            
+            mDriveMotor.set(driveOutput/3);
+            mTurnMotor.set(turnOutput*2); 
             
             // Telemetry
-            SmartDashboard.putNumber("before" + mDriveMotor.getDeviceID(), pNewState.angle.getDegrees());
-            SmartDashboard.putNumber("turn " + mDriveMotor.getDeviceID() + " output", turnOutput);
-            SmartDashboard.putNumber("drive " + mDriveMotor.getDeviceID() + " output", driveOutput);
+            // SmartDashboard.putNumber("before" + mDriveMotor.getDeviceID(), pNewState.angle.getDegrees());
+            // SmartDashboard.putNumber("turn " + mDriveMotor.getDeviceID() + " output", turnOutput);
+            // SmartDashboard.putNumber("drive " + mDriveMotor.getDeviceID() + " output", driveOutput);
             SmartDashboard.putString("Swerve[" + absoluteEncoder.getDeviceID() + "] state", currentSpeeds.toString());
             
         } else {
@@ -117,6 +121,11 @@ public class Module {
             resetRotation();
         }
     }
+
+    public void speedChange() {
+        driveOutput *= fast ? 2 : 1;
+        driveOutput *= slow ? 0.5 : 1;
+    } 
     
     // Read current module angle in Radians
     public double getCurrentAngleRad() {
@@ -137,7 +146,7 @@ public class Module {
         // SmartDashboard.putNumber("sv: drive motor" + mDriveMotor.getDeviceID(), mDriveMotor.getSupplyVoltage().getValue());
         // SmartDashboard.putNumber("mv: turn motor" + mTurnMotor.getDeviceId(), turnOutput);
         // SmartDashboard.putNumber("drive motor" + mDriveMotor.getDeviceID(), mDriveMotor.getPosition().getValue());
-        SmartDashboard.putNumber("absolute encoder" + mDriveMotor.getDeviceID(), absoluteEncoder.getAbsolutePosition().getValueAsDouble());
+        // SmartDashboard.putNumber("absolute encoder" + mDriveMotor.getDeviceID(), absoluteEncoder.getAbsolutePosition().getValueAsDouble());
     }
 
     // Turn module back to 0 position

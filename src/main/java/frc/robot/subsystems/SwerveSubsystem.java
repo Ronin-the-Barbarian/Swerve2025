@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.RobotContainer;
 
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -175,6 +176,9 @@ public class SwerveSubsystem extends SubsystemBase {
         // SmartDashboard.putNumber("Robot Heading", mGyro.getAngle());
         // SmartDashboard.putString("Gyro", getGyroRotation2d().toString());
         // SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
+        SmartDashboard.putNumber("xSpeed", getRobotRelativeSpeeds().vxMetersPerSecond);
+        SmartDashboard.putNumber("ySpeed", getRobotRelativeSpeeds().vyMetersPerSecond);
+        SmartDashboard.putNumber("turningSpeed", getRobotRelativeSpeeds().omegaRadiansPerSecond);
         SmartDashboard.putNumberArray("SwerveModuleLOGGINGStates", loggingState);
 
     }
@@ -196,10 +200,14 @@ public class SwerveSubsystem extends SubsystemBase {
     }
 
     // DRIVE the robot
-    public void drive(ChassisSpeeds chassisSpeed) {
-        this.chassisSpeeds = chassisSpeed;
+    public void drive(ChassisSpeeds newChassisSpeed) {
+        if (RobotContainer.mController.getRawButton(Constants.Controllers.ButtonDPort)) {
+            this.chassisSpeeds = new ChassisSpeeds(0, 0, 0);
+        } else {
+            this.chassisSpeeds = newChassisSpeed;
+        }
         // Convert chassis speeds to each module states
-        SwerveModuleState[] moduleStates = Constants.Mechanical.kDriveKinematics.toSwerveModuleStates(chassisSpeed);
+        SwerveModuleState[] moduleStates = Constants.Mechanical.kDriveKinematics.toSwerveModuleStates(newChassisSpeed);
 
         // Cap max speed
         SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates,
@@ -209,6 +217,14 @@ public class SwerveSubsystem extends SubsystemBase {
         for (int i = 0; i < modules.length; i++) {
             modules[i].setDesiredState(moduleStates[i]);
         }
+    }
+
+    public void toggleFastMode(boolean fastOn) {
+        Module.fast = fastOn;
+    }
+
+    public void toggleSlowMode(boolean slowOn) {
+        Module.slow = slowOn;
     }
 
     public void driveRobotRelative(ChassisSpeeds chassisSpeeds) {
@@ -245,7 +261,6 @@ public class SwerveSubsystem extends SubsystemBase {
                 return false;
             }
         }
-        System.out.println(true);
         return true;
     }
 }

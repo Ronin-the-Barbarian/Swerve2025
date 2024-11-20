@@ -19,25 +19,28 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.SwerveJoystick;
 import frc.robot.commands.ResetRotations;
+import frc.robot.commands.SpeedControl;
 
 
 public class RobotContainer {
 
   // Instances of controllers
   // public final XboxController mController;
-  public final GenericHID mController;
+  public static final GenericHID mController = new GenericHID(0);;
   private final SendableChooser<Command> autoChooser;
   // Subsystems and commands
   private final SwerveSubsystem mSwerveSubsystem;
   private final ResetRotations mResetRotations;
+  private final SpeedControl mSpeeds;
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // mController = new XboxController(0);
-    mController = new GenericHID(0);
     // Subsystems and commands
     mSwerveSubsystem = new SwerveSubsystem();
     mSwerveSubsystem.setDefaultCommand(new SwerveJoystick(mSwerveSubsystem, mController));
     mResetRotations = new ResetRotations(mSwerveSubsystem);
+    mSpeeds = new SpeedControl(mSwerveSubsystem);
+
+    // Autonomous
     autoChooser = AutoBuilder.buildAutoChooser();
     // Another option that allows you to specify the default auto by its name
     // autoChooser = AutoBuilder.buildAutoChooser("My Default Auto");
@@ -50,6 +53,8 @@ public class RobotContainer {
   // Assign buttons to commands
   private void configureButtonBindings() {
     new JoystickButton(mController, Constants.Controllers.ButtonAPort).onTrue(mResetRotations);
+    new JoystickButton(mController, Constants.Controllers.UpperC).whileTrue(mSpeeds.fast);
+    new JoystickButton(mController, Constants.Controllers.LowerC).whileTrue(mSpeeds.slow);
   }
 
 
