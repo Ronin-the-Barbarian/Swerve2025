@@ -86,6 +86,7 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     SmartDashboard.putBoolean("FastMode", Module.fast);
     SmartDashboard.putBoolean("SlowMode", Module.slow);
+    SmartDashboard.putBoolean("NormalMode", !(Module.slow || Module.fast));
   }
 
   @Override

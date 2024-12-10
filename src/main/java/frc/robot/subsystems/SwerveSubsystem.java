@@ -22,6 +22,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.RobotContainer;
 
+import com.studica.frc.AHRS;
+
 
 public class SwerveSubsystem extends SubsystemBase {
     // Make instances of all 4 modules
@@ -73,6 +75,8 @@ public class SwerveSubsystem extends SubsystemBase {
     private final SwerveDriveOdometry mOdometer;
     private RobotConfig pathPlannerConfig;
 
+    private final AHRS mGyro;
+
     private ChassisSpeeds chassisSpeeds = new ChassisSpeeds(0, 0, 0);
 
     // Simulated field
@@ -99,6 +103,8 @@ public class SwerveSubsystem extends SubsystemBase {
         
         // Simulated field
         SmartDashboard.putData("Field", mField2d);
+
+        mGyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
         
         try{
             pathPlannerConfig = RobotConfig.fromGUISettings();
@@ -130,6 +136,18 @@ public class SwerveSubsystem extends SubsystemBase {
         },
         this // Reference to this subsystem to set requirements
         );
+    }
+
+    public void zeroHeading() {
+        mGyro.reset();
+    }
+
+    public double getHeading() {
+        return Math.IEEEremainder(mGyro.getAngle(), 360);
+    }
+
+    public Rotation2d getGyroRotation2d() {
+        return mGyro.getRotation2d();
     }
 
     // Get position of robot based on odometer
@@ -173,8 +191,8 @@ public class SwerveSubsystem extends SubsystemBase {
         };
 
         // Debug telemetry
-        // SmartDashboard.putNumber("Robot Heading", mGyro.getAngle());
-        // SmartDashboard.putString("Gyro", getGyroRotation2d().toString());
+        SmartDashboard.putNumber("Robot Heading", mGyro.getAngle());
+        SmartDashboard.putString("Gyro", getGyroRotation2d().toString());
         // SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
         SmartDashboard.putNumber("xSpeed", getRobotRelativeSpeeds().vxMetersPerSecond);
         SmartDashboard.putNumber("ySpeed", getRobotRelativeSpeeds().vyMetersPerSecond);

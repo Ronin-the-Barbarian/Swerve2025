@@ -46,7 +46,6 @@ public class Module {
     private double turnDistance;
     public Field2d field;
 
-
     // Constructores
     public Module(
         int pDrivePort, int pTurnPort, boolean pDriveReversed, boolean pTurnReversed,
@@ -64,7 +63,7 @@ public class Module {
             absoluteEncoderOffset = pAbsoluteEncoderOffset;
             
             //PID Controller - change PID values when get feedback
-            turningPID = new PIDController(0.05, 0, 0);
+            turningPID = new PIDController(0.025, 0, 0);
             turningPID.enableContinuousInput(-Math.PI, Math.PI); // minimize rotations to 180
             // P = rate of change
             // I = rate of change of D
