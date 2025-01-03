@@ -53,8 +53,28 @@ public class SwerveJoystick extends Command {
 
         // Set desire chassis speeds based on field or robot relative
         ChassisSpeeds chassisSpeed;
-        chassisSpeed = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed);
+        // chassisSpeed = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed);
+
+        // // double rcw = pJoystick->GetTwist();
+        // // double forwrd = pJoystick->GetY() * -1; /* Invert stick Y axis */
+        // // double strafe = pJoystick->GetX();
+        // // float pi = 3.1415926;
+        // /* Adjust Joystick X/Y inputs by navX MXP yaw angle */
+        // double gyro_degrees = mSwerveSubsystem.getHeading();
+        // double gyro_radians = gyro_degrees * Math.PI/180; 
+        // double temp = xSpeed * Math.cos(gyro_radians) + ySpeed * Math.sin(gyro_radians);
+        // ySpeed = -xSpeed * Math.sin(gyro_radians) + ySpeed * Math.cos(gyro_radians);
+        // xSpeed = temp;
+        // /* At this point, Joystick X/Y (strafe/forwrd) vectors have been */
+        // /* rotated by the gyro angle, and can be sent to drive system */
+
+
+        chassisSpeed = ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, turningSpeed, mSwerveSubsystem.geRotation2d());
+        // chassisSpeed = new ChassisSpeeds(xSpeed, ySpeed, turningSpeed);
+
         chassisSpeed = ChassisSpeeds.discretize(chassisSpeed, 0.02);
+        // chassisSpeed.vxMetersPerSecond *= -1;
+        // chassisSpeed.vyMetersPerSecond *= -1;
 
         // Drive
         mSwerveSubsystem.drive(chassisSpeed);

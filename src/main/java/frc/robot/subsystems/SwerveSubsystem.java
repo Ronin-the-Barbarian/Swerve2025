@@ -7,6 +7,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -104,7 +105,7 @@ public class SwerveSubsystem extends SubsystemBase {
         // Simulated field
         SmartDashboard.putData("Field", mField2d);
 
-        mGyro = new AHRS(AHRS.NavXComType.kMXP_SPI);
+        mGyro = new AHRS(AHRS.NavXComType.kUSB1);
         
         try{
             pathPlannerConfig = RobotConfig.fromGUISettings();
@@ -144,10 +145,15 @@ public class SwerveSubsystem extends SubsystemBase {
 
     public double getHeading() {
         return Math.IEEEremainder(mGyro.getAngle(), 360);
+        // return MathUtil.inputModulus(mGyro.getAngle(), 0, 360);
     }
 
     public Rotation2d getGyroRotation2d() {
         return mGyro.getRotation2d();
+    }
+
+    public Rotation2d geRotation2d() {
+        return Rotation2d.fromDegrees(getHeading());
     }
 
     // Get position of robot based on odometer
@@ -191,7 +197,7 @@ public class SwerveSubsystem extends SubsystemBase {
         };
 
         // Debug telemetry
-        SmartDashboard.putNumber("Robot Heading", mGyro.getAngle());
+        SmartDashboard.putNumber("Robot Heading", getHeading());
         SmartDashboard.putString("Gyro", getGyroRotation2d().toString());
         // SmartDashboard.putString("Robot Location", getPose().getTranslation().toString());
         SmartDashboard.putNumber("xSpeed", getRobotRelativeSpeeds().vxMetersPerSecond);
